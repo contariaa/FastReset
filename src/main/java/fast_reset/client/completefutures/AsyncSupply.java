@@ -49,21 +49,23 @@ public final class AsyncSupply<T> implements Runnable {
      * Copy of {@link CompletableFuture#thenApplyAsync(Function, Executor)}, using our own cancellable version of AsyncSupply.
      */
     public static <T, U> CompletableFuture<U> thenApplyAsync(CompletableFuture<T> from, Function<T, U> function, Executor executor) {
-        return from.thenApply(result -> {
-            CompletableFuture<U> future = new CompletableFuture<>();
-            executor.execute(new AsyncSupply<>(future, () -> function.apply(result)));
-            return future.join();
+        CompletableFuture<U> future = new CompletableFuture<>();
+        from.thenAccept(result -> executor.execute(new AsyncSupply<>(future, () -> function.apply(result)))).exceptionally(throwable -> {
+            future.completeExceptionally(throwable);
+            return null;
         });
+        return future;
     }
 
     /**
      * Copy of {@link CompletableFuture#exceptionallyAsync(Function, Executor)}, using our own cancellable version of AsyncSupply.
      */
     public static <T> CompletableFuture<T> exceptionallyAsync(CompletableFuture<T> from, Function<Throwable, T> function, Executor executor) {
-        return from.exceptionally(throwable -> {
-            CompletableFuture<T> future = new CompletableFuture<>();
+        CompletableFuture<T> future = new CompletableFuture<>();
+        from.thenAccept(future::complete).exceptionally(throwable -> {
             executor.execute(new AsyncSupply<>(future, () -> function.apply(throwable)));
-            return future.join();
+            return null;
         });
+        return future;
     }
 }
