@@ -1,5 +1,6 @@
 package fast_reset.client.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import fast_reset.client.FastReset;
 import fast_reset.client.interfaces.FRMinecraftServer;
@@ -46,6 +47,17 @@ public abstract class MinecraftServerMixin extends ReentrantThreadExecutor<Serve
     )
     private boolean disablePlayerSaving(PlayerManager playerManager) {
         return this.fastReset$shouldSave();
+    }
+
+    @ModifyExpressionValue(
+            method = "shutdown",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Ljava/util/stream/Stream;anyMatch(Ljava/util/function/Predicate;)Z"
+            )
+    )
+    private boolean disableShutdownDelay(boolean anyMatch) {
+        return anyMatch && this.fastReset$shouldSave();
     }
 
     @WrapWithCondition(
