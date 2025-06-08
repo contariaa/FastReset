@@ -13,8 +13,13 @@
     }
   ],
   "contributors": [
-    "contaria"
+    "contaria",
+    "tildejustin"
   ],
+  "contact": {
+    "sources": "https://github.com/contariaa/FastReset",
+    "issues": "https://github.com/contariaa/FastReset/issues"
+  },
   "license": "MIT",
   "environment": "client",
   "custom": {
@@ -28,6 +33,6 @@
   "depends": {
     "fabricloader": ">=0.16.0",
     "minecraft": "1.16.x",
-    "speedrunapi": ">=2.0-beta.1"
+    "speedrunapi": ">=2.0"
   }
 }
