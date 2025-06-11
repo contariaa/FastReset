@@ -13,8 +13,13 @@
     }
   ],
   "contributors": [
-    "contaria"
+    "contaria",
+    "tildejustin"
   ],
+  "contact": {
+    "sources": "https://github.com/contariaa/FastReset",
+    "issues": "https://github.com/contariaa/FastReset/issues"
+  },
   "license": "MIT",
   "environment": "client",
   "custom": {
