@@ -51,12 +51,9 @@ public class FastResetConfig implements SpeedrunConfig {
     public void onLoad(JsonObject jsonObject, SpeedrunConfigParsedMetadata metadata) {
         if (metadata.getDataVersion() < 1) {
             JsonElement buttonLocation = jsonObject.get("buttonLocation");
-            if (buttonLocation != null && buttonLocation.isJsonPrimitive() && buttonLocation.getAsJsonPrimitive().isString()) {
-                if ("REPLACE_SQ".equals(buttonLocation.getAsString())) {
-                    jsonObject.remove("buttonLocation");
-                    jsonObject.add("buttonLocation", new JsonPrimitive(ButtonLocation.CENTER.name()));
-                }
-            };
+            if (buttonLocation != null && "REPLACE_SQ".equals(buttonLocation.getAsString())) {
+                jsonObject.add("buttonLocation", new JsonPrimitive(ButtonLocation.CENTER.name()));
+            }
         }
     }
 }
