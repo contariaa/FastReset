@@ -1,8 +1,12 @@
 package fast_reset.client;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import fast_reset.client.gui.TimeSliderWidget;
 import me.contaria.speedrunapi.config.SpeedrunConfigAPI;
 import me.contaria.speedrunapi.config.api.SpeedrunConfig;
+import me.contaria.speedrunapi.config.api.SpeedrunConfigParsedMetadata;
 import me.contaria.speedrunapi.config.api.SpeedrunOption;
 import me.contaria.speedrunapi.util.TextUtil;
 import org.jetbrains.annotations.Nullable;
@@ -35,7 +39,24 @@ public class FastResetConfig implements SpeedrunConfig {
     public enum ButtonLocation {
         BOTTOM_RIGHT,
         CENTER,
-        REPLACE_SQ,
         HIDE
+    }
+
+    @Override
+    public int getDataVersion() {
+        return 1;
+    }
+
+    @Override
+    public void onLoad(JsonObject jsonObject, SpeedrunConfigParsedMetadata metadata) {
+        if (metadata.getDataVersion() < 1) {
+            JsonElement buttonLocation = jsonObject.get("buttonLocation");
+            if (buttonLocation != null && buttonLocation.isJsonPrimitive() && buttonLocation.getAsJsonPrimitive().isString()) {
+                if ("REPLACE_SQ".equals(buttonLocation.getAsString())) {
+                    jsonObject.remove("buttonLocation");
+                    jsonObject.add("buttonLocation", new JsonPrimitive(ButtonLocation.CENTER.name()));
+                }
+            };
+        }
     }
 }
