@@ -46,15 +46,6 @@ public abstract class GameMenuScreenMixin extends Screen {
         int x;
         int y;
         switch (FastReset.config.buttonLocation) {
-            case REPLACE_SQ:
-                width = saveButton.getWidth();
-                x = saveButton.getX();
-                y = saveButton.getY();
-
-                saveButton.setWidth(this.textRenderer.getWidth(saveButton.getMessage()) + 30);
-                saveButton.setX(this.width - saveButton.getWidth() - 4);
-                saveButton.setY(this.height - saveButton.getHeight() - 4);
-                break;
             case CENTER:
                 width = saveButton.getWidth();
                 x = saveButton.getX();
