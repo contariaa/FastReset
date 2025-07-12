@@ -14,7 +14,7 @@ import java.lang.reflect.Field;
 
 public class FastResetConfig implements SpeedrunConfig {
     public ButtonLocation buttonLocation = ButtonLocation.BOTTOM_RIGHT;
-    public int alwaysSaveAfter = 0;
+    public int alwaysSaveAfter = 150;
 
     {
         FastReset.config = this;
