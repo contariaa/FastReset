@@ -1,5 +1,6 @@
 package fast_reset.client.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import fast_reset.client.FastReset;
 import fast_reset.client.FastResetConfig;
 import fast_reset.client.interfaces.FRMinecraftServer;
@@ -13,7 +14,7 @@ import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Slice;
 
 @Mixin(GameMenuScreen.class)
 public abstract class GameMenuScreenMixin extends Screen {
@@ -22,12 +23,21 @@ public abstract class GameMenuScreenMixin extends Screen {
         super(title);
     }
 
-    @ModifyVariable(
+    @ModifyExpressionValue(
             method = "initWidgets",
-            at = @At("STORE"),
-            ordinal = 1
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/gui/screen/GameMenuScreen;addButton(Lnet/minecraft/client/gui/widget/AbstractButtonWidget;)Lnet/minecraft/client/gui/widget/AbstractButtonWidget;",
+                    ordinal = 0
+            ),
+            slice = @Slice(
+                    from = @At(
+                            value = "CONSTANT",
+                            args = "stringValue=menu.returnToMenu"
+                    )
+            )
     )
-    private ButtonWidget createFastResetButton(ButtonWidget saveButton) {
+    private AbstractButtonWidget createFastResetButton(AbstractButtonWidget saveButton) {
         if (!MinecraftClient.getInstance().isInSingleplayer() || !this.shouldFastReset()) {
             return saveButton;
         }
@@ -54,7 +64,7 @@ public abstract class GameMenuScreenMixin extends Screen {
             if (MinecraftClient.getInstance().getServer() != null) {
                 ((FRMinecraftServer) MinecraftClient.getInstance().getServer()).fastReset$fastReset();
             }
-            saveButton.onPress();
+            ((ButtonWidget) saveButton).onPress();
         }));
 
         fastResetButton.visible = FastReset.config.buttonLocation != FastResetConfig.ButtonLocation.HIDE;
