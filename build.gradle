@@ -1,31 +1,21 @@
 plugins {
-    id "fabric-loom" version "1.5-SNAPSHOT"
+    id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
     id 'maven-publish'
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
-
 version = project.mod_version + "+" + project.target_version
-group = maven_group
-
-base {
-    //noinspection GrDeprecatedAPIUsage
-    archivesBaseName = archives_base_name
-}
 
 repositories {
     maven { url "https://jitpack.io" }
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:$minecraft_version"
-    mappings "dev.tildejustin:yarn:$project.yarn_mappings:v2"
-    modImplementation "net.fabricmc:fabric-loader:$loader_version"
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "dev.tildejustin:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     // SpeedrunAPI
-    // check for the latest versions at https://jitpack.io/#contariaa/speedrunapi
-    modImplementation "com.github.contariaa:SpeedrunAPI:96811e85e8"
+    modImplementation "com.github.contariaa:SpeedrunAPI:${project.speedrunapi_version}"
     annotationProcessor "com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.1.1"
 }
 
@@ -34,6 +24,7 @@ loom {
 }
 
 processResources {
+    def version = project.version
     inputs.property "version", version
 
     filesMatching("fabric.mod.json") {
@@ -51,11 +42,17 @@ java {
     // if it is present.
     // If you remove this line, sources will not be generated.
     withSourcesJar()
+
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 jar {
+    def projectName = project.name
+    inputs.property "projectName", projectName
+
     from("LICENSE") {
-        rename { "${it}_${base.archivesName.get()}" }
+        rename { "${it}_$projectName"}
     }
 }
 
