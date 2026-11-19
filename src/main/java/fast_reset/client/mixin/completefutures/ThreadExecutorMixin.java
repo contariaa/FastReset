@@ -46,8 +46,12 @@ public abstract class ThreadExecutorMixin implements FRThreadExecutor {
     @Inject(
             method = {
                     "submit(Ljava/util/function/Supplier;)Ljava/util/concurrent/CompletableFuture;",
+                    "submitAsync",
+                    //? if <1.15 {
+                    /*"method_20493",
+                    *///? } else {
                     "submit(Ljava/lang/Runnable;)Ljava/util/concurrent/CompletableFuture;",
-                    "submitAsync"
+                     //? }
             },
             at = @At("HEAD"),
             cancellable = true
@@ -59,7 +63,7 @@ public abstract class ThreadExecutorMixin implements FRThreadExecutor {
     }
 
     @Override
-    public synchronized void fast_reset$cancelFutures() {
+    public synchronized void fastReset$cancelFutures() {
         this.fastClosed = true;
         for (Runnable task : this.tasks) {
             if (task instanceof AsyncSupply) {

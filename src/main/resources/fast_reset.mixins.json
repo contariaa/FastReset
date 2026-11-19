@@ -3,18 +3,9 @@
   "minVersion": "0.8",
   "package": "fast_reset.client.mixin",
   "compatibilityLevel": "JAVA_8",
-  "client": [
-    "GameMenuScreenMixin",
-    "MinecraftServerMixin",
-    "RegionFileMixin",
-    "ServerChunkManagerMixin",
-    "StorageIoWorkerMixin",
-    "completefutures.ChunkHolderMixin",
-    "completefutures.ServerChunkManagerMixin",
-    "completefutures.TaskExecutorMixin",
-    "completefutures.ThreadedAnvilChunkStorageMixin",
-    "completefutures.ThreadExecutorMixin"
-  ],
+  "mixinextras": {
+    "minVersion": "0.5.5"
+  },
   "injectors": {
     "defaultRequire": 1
   }

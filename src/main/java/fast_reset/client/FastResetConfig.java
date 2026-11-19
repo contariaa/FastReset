@@ -15,7 +15,11 @@ public class FastResetConfig implements SpeedrunConfig {
     public ButtonLocation buttonLocation = ButtonLocation.BOTTOM_RIGHT;
 
     @Config.Numbers.Whole.Bounds(min = 0, max = 300, enforce = Config.Numbers.EnforceBounds.MIN_ONLY)
+    //? if <1.16 {
+    /*@Config.Text(getter = "getAlwaysSaveAfterString")
+    *///? } else {
     @Config.Text(getter = "getAlwaysSaveAfterText")
+    //? }
     public int alwaysSaveAfter = 150;
 
     {
@@ -56,6 +60,13 @@ public class FastResetConfig implements SpeedrunConfig {
                 .map(entry -> TextUtil.translatable(baseKey + "." + entry.getKey(), entry.getValue()))
                 .reduce((text, text2) -> text.append(" ").append(text2)).orElse(TextUtil.translatable(baseKey + ".unknown"));
     }
+
+    //? if <1.16 {
+    /*@SuppressWarnings("unused")
+    public String getAlwaysSaveAfterString(int value) {
+        return this.getAlwaysSaveAfterText(value).asFormattedString();
+    }
+    *///? }
 
     public enum ButtonLocation {
         BOTTOM_RIGHT,

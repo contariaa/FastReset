@@ -1,6 +1,5 @@
 package fast_reset.client.mixin.completefutures;
 
-import com.mojang.datafixers.util.Either;
 import fast_reset.client.FastReset;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.thread.MessageListener;
@@ -16,6 +15,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+
+//? if >=1.16 {
+import com.mojang.datafixers.util.Either;
+//? }
 
 @Mixin(TaskExecutor.class)
 public abstract class TaskExecutorMixin<T> implements MessageListener<T> {
@@ -83,8 +86,16 @@ public abstract class TaskExecutorMixin<T> implements MessageListener<T> {
         return this.saveFuture(MessageListener.super.ask(messageProvider));
     }
 
+    //? if >=1.16 {
     @Override
-    public <Source> CompletableFuture<Source> askFallible(Function<? super MessageListener<Either<Source, Exception>>, ? extends T> function) {
+    //? if <1.17 {
+    public <Source> CompletableFuture<Source> method_27918(Function<? super MessageListener<Either<Source, Exception>>, ? extends T> function) {
+        return this.saveFuture(MessageListener.super.method_27918(function));
+    }
+    //? } else {
+    /*public <Source> CompletableFuture<Source> askFallible(Function<? super MessageListener<Either<Source, Exception>>, ? extends T> function) {
         return this.saveFuture(MessageListener.super.askFallible(function));
     }
+    *///? }
+    //? }
 }

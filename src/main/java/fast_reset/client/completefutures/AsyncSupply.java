@@ -4,6 +4,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Supplier;
 
+//? if >=1.19 {
+/*import java.util.function.Function;
+*///? }
+
 public final class AsyncSupply<T> implements Runnable {
     private CompletableFuture<T> future;
     private Supplier<? extends T> supplier;
@@ -35,12 +39,32 @@ public final class AsyncSupply<T> implements Runnable {
         this.future = null;
     }
 
-    /**
-     * Copy of {@link CompletableFuture#supplyAsync}, using our own cancellable version of AsyncSupply.
-     */
+    // Copy of {@link CompletableFuture#supplyAsync(Supplier, Executor)}, using our own cancellable version of AsyncSupply.
     public static <U> CompletableFuture<U> supplyAsync(Supplier<U> supplier, Executor executor) {
         CompletableFuture<U> future = new CompletableFuture<>();
         executor.execute(new AsyncSupply<>(future, supplier));
         return future;
     }
+
+    //? if >=1.19 {
+    /*// Copy of {@link CompletableFuture#thenApplyAsync(Function, Executor)}, using our own cancellable version of AsyncSupply.
+    public static <T, U> CompletableFuture<U> thenApplyAsync(CompletableFuture<T> from, Function<T, U> function, Executor executor) {
+        CompletableFuture<U> future = new CompletableFuture<>();
+        from.thenAccept(result -> executor.execute(new AsyncSupply<>(future, () -> function.apply(result)))).exceptionally(throwable -> {
+            future.completeExceptionally(throwable);
+            return null;
+        });
+        return future;
+    }
+
+    // Copy of {@link CompletableFuture#exceptionallyAsync(Function, Executor)}, using our own cancellable version of AsyncSupply.
+    public static <T> CompletableFuture<T> exceptionallyAsync(CompletableFuture<T> from, Function<Throwable, T> function, Executor executor) {
+        CompletableFuture<T> future = new CompletableFuture<>();
+        from.thenAccept(future::complete).exceptionally(throwable -> {
+            executor.execute(new AsyncSupply<>(future, () -> function.apply(throwable)));
+            return null;
+        });
+        return future;
+    }
+    *///? }
 }

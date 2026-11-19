@@ -2,13 +2,13 @@ package fast_reset.client.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import fast_reset.client.FastReset;
 import fast_reset.client.interfaces.FRMinecraftServer;
 import fast_reset.client.interfaces.FRThreadExecutor;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
-import net.minecraft.server.ServerTask;
-import net.minecraft.util.thread.ReentrantThreadExecutor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -16,8 +16,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+//? if >=1.18.2 {
+/*import java.util.function.Predicate;
+import java.util.stream.Stream;
+*///? }
+
 @Mixin(MinecraftServer.class)
-public abstract class MinecraftServerMixin extends ReentrantThreadExecutor<ServerTask> implements FRMinecraftServer {
+public abstract class MinecraftServerMixin implements FRMinecraftServer {
     @Shadow
     private volatile boolean running;
     @Shadow
@@ -25,10 +30,6 @@ public abstract class MinecraftServerMixin extends ReentrantThreadExecutor<Serve
 
     @Unique
     private volatile boolean fastReset;
-
-    public MinecraftServerMixin(String string) {
-        super(string);
-    }
 
     @ModifyReturnValue(
             method = "shouldKeepTicking",
@@ -59,15 +60,34 @@ public abstract class MinecraftServerMixin extends ReentrantThreadExecutor<Serve
         return this.fastReset$shouldSave();
     }
 
-    @WrapWithCondition(
+    //? if >=1.18.2 {
+    /*@WrapOperation(
+            method = "shutdown",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Ljava/util/stream/Stream;anyMatch(Ljava/util/function/Predicate;)Z"
+            )
+    )
+    private boolean disableShutdownDelay(Stream<?> stream, Predicate<?> predicate, Operation<Boolean> original) {
+        if (this.fastReset$shouldSave()) {
+            return original.call(stream, predicate);
+        }
+        return false;
+    }
+    *///? }
+
+    @WrapOperation(
             method = "shutdown",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/server/MinecraftServer;save(ZZZ)Z"
             )
     )
-    private boolean disableSaving(MinecraftServer server, boolean bl, boolean bl2, boolean bl3) {
-        return this.fastReset$shouldSave();
+    private boolean disableSaving(MinecraftServer server, boolean bl, boolean bl2, boolean bl3, Operation<Boolean> original) {
+        if (this.fastReset$shouldSave()) {
+            return original.call(server, bl, bl2, bl3);
+        }
+        return false;
     }
 
     @Inject(
@@ -76,7 +96,7 @@ public abstract class MinecraftServerMixin extends ReentrantThreadExecutor<Serve
     )
     private void cancelRemainingTasks(CallbackInfo ci) {
         if (!this.fastReset$shouldSave()) {
-            ((FRThreadExecutor) this).fast_reset$cancelFutures();
+            ((FRThreadExecutor) this).fastReset$cancelFutures();
         }
     }
 
