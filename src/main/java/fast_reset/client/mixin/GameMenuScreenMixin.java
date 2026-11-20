@@ -7,6 +7,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -127,8 +128,9 @@ public abstract class GameMenuScreenMixin extends Screen {
 
     @Unique
     private void fastReset(ButtonWidget saveButton) {
-        if (MinecraftClient.getInstance().getServer() != null) {
-            ((FRMinecraftServer) MinecraftClient.getInstance().getServer()).fastReset$fastReset();
+        MinecraftServer server = MinecraftClient.getInstance().getServer();
+        if (server != null) {
+            ((FRMinecraftServer) server).fastReset$fastReset();
         }
         saveButton.onPress();
     }
@@ -138,6 +140,7 @@ public abstract class GameMenuScreenMixin extends Screen {
         if (FastReset.config.alwaysSaveAfter == 0) {
             return true;
         }
-        return MinecraftClient.getInstance().getServer() != null && MinecraftClient.getInstance().getServer().getTicks() <= FastReset.config.alwaysSaveAfter * 20;
+        MinecraftServer server = MinecraftClient.getInstance().getServer();
+        return server != null && server.getTicks() <= FastReset.config.alwaysSaveAfter * 20;
     }
 }
