@@ -1,8 +1,9 @@
 plugins {
     id("fabric-loom")
-    kotlin("jvm") version "2.2.10"
-    id("com.google.devtools.ksp") version "2.2.10-2.0.2"
-    id("dev.kikugie.fletching-table.fabric") version "0.1.0-alpha.22"
+    kotlin("jvm") version "2.4.21"
+    id("com.google.devtools.ksp") version "2.3.12"
+    alias(ft.plugins.default)
+    alias(ft.plugins.fabric)
 }
 
 version = "${property("mod.version")}+MC${stonecutter.current.version}"
@@ -84,13 +85,10 @@ configurations.configureEach {
 }
 
 fletchingTable {
-    mixins.create("main") {
-        mixin("default", "fast_reset.mixins.json") {
+    mixins.configure("main") {
+        mixin("fast_reset.mixins.json") {
             env("CLIENT", "fast_reset.client.mixin")
         }
-    }
-    mixins.all {
-        automatic = true
     }
 }
 
