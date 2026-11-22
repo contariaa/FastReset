@@ -17,8 +17,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //? if >=1.18.2 {
-/*import java.util.function.Predicate;
-import java.util.stream.Stream;
+/*import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 *///? }
 
 @Mixin(MinecraftServer.class)
@@ -61,18 +60,15 @@ public abstract class MinecraftServerMixin implements FRMinecraftServer {
     }
 
     //? if >=1.18.2 {
-    /*@WrapOperation(
+    /*@ModifyExpressionValue(
             method = "shutdown",
             at = @At(
                     value = "INVOKE",
                     target = "Ljava/util/stream/Stream;anyMatch(Ljava/util/function/Predicate;)Z"
             )
     )
-    private boolean disableShutdownDelay(Stream<?> stream, Predicate<?> predicate, Operation<Boolean> original) {
-        if (this.fastReset$shouldSave()) {
-            return original.call(stream, predicate);
-        }
-        return false;
+    private boolean doNotDelayShutdown(boolean shouldDelayShutdown) {
+        return shouldDelayShutdown && !this.fastReset;
     }
     *///? }
 
